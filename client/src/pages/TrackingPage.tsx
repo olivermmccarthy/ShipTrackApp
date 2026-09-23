@@ -176,6 +176,7 @@ function ShipmentResult({ shipment }: { shipment: Shipment }) {
           ))}
         </ol>
       )}
+      <EnquiryForm trackingNumber={shipment.trackingNumber} />
     </div>
   );
 }
@@ -200,4 +201,77 @@ function formatDateTime(iso: string) {
 
 function formatKey(key: string) {
   return key.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase());
+}
+
+function EnquiryForm({ trackingNumber }: { trackingNumber: string }) {
+  const [category, setCategory] = useState('General Question');
+  const [message, setMessage] = useState('');
+  const [status, setStatus] = useState<
+    'idle' | 'submitting' | 'success' | 'error'
+  >('idle');
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!message.trim()) return;
+
+    setStatus('submitting');
+    try {
+      const res = await fetch('/api/enquiries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ trackingNumber, category, message }),
+      });
+      if (!res.ok) throw new Error();
+      setStatus('success');
+      setMessage('');
+    } catch {
+      setStatus('error');
+    }
+  }
+
+  if (status === 'success') {
+    return (
+      <p className="enquiry-success">
+        Thanks, your enquiry has been submitted. Our team will get back to you.
+      </p>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="enquiry-form">
+      <h2>Have a question about this shipment?</h2>
+
+      <label htmlFor="category">Category</label>
+      <select
+        id="category"
+        value={category}
+        onChange={(e) => setCategory(e.target.value)}
+      >
+        <option>General Question</option>
+        <option>Delivery Time</option>
+        <option>Delay</option>
+        <option>Address Issue</option>
+        <option>Damaged Item</option>
+      </select>
+
+      <label htmlFor="message">Message</label>
+      <textarea
+        id="message"
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        rows={4}
+        required
+      />
+
+      {status === 'error' && (
+        <p className="error-message" role="alert">
+          Something went wrong submitting your enquiry. Please try again.
+        </p>
+      )}
+
+      <button type="submit" disabled={status === 'submitting'}>
+        {status === 'submitting' ? 'Submitting…' : 'Submit enquiry'}
+      </button>
+    </form>
+  );
 }

@@ -1,5 +1,6 @@
 import { Routes, Route, Link } from 'react-router-dom';
 import TrackingPage from './pages/TrackingPage';
+import './App.css';
 
 export default function App() {
   return (
