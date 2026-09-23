@@ -52,3 +52,57 @@ const port = process.env.PORT ?? 3001;
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
+
+app.post('/api/enquiries', async (req, res) => {
+  const { trackingNumber, category, message } = req.body;
+
+  if (
+    typeof trackingNumber !== 'string' ||
+    typeof category !== 'string' ||
+    typeof message !== 'string' ||
+    !trackingNumber.trim() ||
+    !category.trim() ||
+    !message.trim()
+  ) {
+    return res
+      .status(400)
+      .json({
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'trackingNumber, category and message are all required.',
+        },
+      });
+  }
+
+  const shipment = await prisma.shipment.findUnique({
+    where: { trackingNumber: trackingNumber.toUpperCase() },
+  });
+
+  if (!shipment) {
+    return res
+      .status(404)
+      .json({
+        error: {
+          code: 'NOT_FOUND',
+          message: 'No shipment found with that tracking number.',
+        },
+      });
+  }
+
+  const enquiry = await prisma.enquiry.create({
+    data: {
+      trackingNumber: shipment.trackingNumber,
+      category,
+      message,
+    },
+  });
+
+  res.status(201).json({
+    id: enquiry.id,
+    trackingNumber: enquiry.trackingNumber,
+    category: enquiry.category,
+    message: enquiry.message,
+    state: enquiry.state,
+    createdAt: enquiry.createdAt,
+  });
+});
