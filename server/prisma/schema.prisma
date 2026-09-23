@@ -18,3 +18,68 @@ model StaffUser {
   passwordHash String
   createdAt    DateTime @default(now())
 }
+
+enum ShipmentStatus {
+  CREATED
+  COLLECTED
+  IN_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  DELAYED
+  EXCEPTION
+}
+
+enum EnquiryState {
+  OPEN
+  RESOLVED
+}
+
+model Shipment {
+  id                        String         @id @default(uuid())
+  trackingNumber            String         @unique
+  status                    ShipmentStatus @default(CREATED)
+  origin                    String
+  destination                String
+  estimatedDelivery          DateTime
+  originalEstimatedDelivery  DateTime
+  currentLocation            String
+  details                    Json
+  createdAt                  DateTime       @default(now())
+  updatedAt                  DateTime       @updatedAt
+
+  events       TrackingEvent[]
+  notes        InternalNote[]
+  enquiries    Enquiry[]
+}
+
+model TrackingEvent {
+  id         String         @id @default(uuid())
+  status     ShipmentStatus
+  location   String
+  message    String
+  occurredAt DateTime
+  createdAt  DateTime       @default(now())
+
+  shipment   Shipment @relation(fields: [shipmentId], references: [id])
+  shipmentId String
+}
+
+model InternalNote {
+  id        String   @id @default(uuid())
+  body      String
+  createdAt DateTime @default(now())
+
+  shipment   Shipment @relation(fields: [shipmentId], references: [id])
+  shipmentId String
+}
+
+model Enquiry {
+  id        String       @id @default(uuid())
+  category  String
+  message   String
+  state     EnquiryState @default(OPEN)
+  createdAt DateTime     @default(now())
+
+  shipment       Shipment @relation(fields: [trackingNumber], references: [trackingNumber])
+  trackingNumber String
+}

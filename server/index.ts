@@ -1,4 +1,5 @@
-import express from "express";
+import 'dotenv/config';
+import express from 'express';
 
 const app = express();
 
@@ -7,5 +8,5 @@ app.get('/api/health', (req, res) => {
 });
 
 app.listen(3001, () => {
-    console.log("Server listening on port 3001");
+  console.log('Server listening on port 3001');
 });
