@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { prisma } from '../src/db.js';
 import { ShipmentStatus, EnquiryState } from '../generated/prisma/client.js';
+import bcrypt from 'bcryptjs';
 
 type SeedEvent = {
   status: ShipmentStatus;
@@ -430,6 +431,18 @@ const enquiries = [
 ];
 
 async function main() {
+
+  const staffEmail = process.env.SEED_STAFF_EMAIL!;
+  const staffPassword = process.env.SEED_STAFF_PASSWORD!;
+  const passwordHash = await bcrypt.hash(staffPassword, 10);
+
+  await prisma.staffUser.upsert({
+    where: { email: staffEmail.toLowerCase() },
+    update: {},
+    create: { email: staffEmail.toLowerCase(), passwordHash },
+  });
+  console.log('Seeded staff user:', staffEmail);
+  
   const shipmentIds: Record<string, string> = {};
 
   for (const s of shipments) {
