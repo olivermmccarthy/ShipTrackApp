@@ -119,6 +119,9 @@ function EditDetailsForm({
   const [currentLocation, setCurrentLocation] = useState(
     shipment.currentLocation,
   );
+  const [estimatedDelivery, setEstimatedDelivery] = useState(
+    shipment.estimatedDelivery.slice(0, 10),
+  );
   const [submitting, setSubmitting] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -130,7 +133,12 @@ function EditDetailsForm({
       const res = await fetch(`/api/staff/shipments/${shipment.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ origin, destination, currentLocation }),
+        body: JSON.stringify({
+          origin,
+          destination,
+          currentLocation,
+          estimatedDelivery: new Date(estimatedDelivery).toISOString(),
+        }),
       });
       if (res.ok) {
         setSaved(true);
@@ -161,16 +169,12 @@ function EditDetailsForm({
       />
 
       <label htmlFor="currentLocation">Current location</label>
-      <input
-        id="currentLocation"
-        value={currentLocation}
-        onChange={(e) => setCurrentLocation(e.target.value)}
-        required
-      />
+      <input id="currentLocation" value={currentLocation} onChange={(e) => setCurrentLocation(e.target.value)} required />
 
-      <button type="submit" disabled={submitting}>
-        {submitting ? 'Saving…' : 'Save details'}
-      </button>
+      <label htmlFor="estimatedDelivery">Estimated delivery</label>
+      <input id="estimatedDelivery" type="date" value={estimatedDelivery} onChange={(e) => setEstimatedDelivery(e.target.value)} required />
+
+      <button type="submit" disabled={submitting}>{submitting ? "Saving…" : "Save details"}</button>
       {saved && (
         <span className="save-confirm" role="status">
           {' '}

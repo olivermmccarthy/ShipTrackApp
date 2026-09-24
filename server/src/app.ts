@@ -309,6 +309,7 @@ const editShipmentSchema = z.object({
   origin: z.string().trim().min(1).optional(),
   destination: z.string().trim().min(1).optional(),
   currentLocation: z.string().trim().min(1).optional(),
+  estimatedDelivery: z.string().datetime().optional(),
   details: z.record(z.union([z.string(), z.number()])).optional(),
 });
 
@@ -334,9 +335,15 @@ staffRouter.patch('/shipments/:id', async (req, res) => {
       .json({ error: { code: 'NOT_FOUND', message: 'Shipment not found.' } });
   }
 
+  const { estimatedDelivery, ...rest } = parsed.data;
   const updated = await prisma.shipment.update({
     where: { id: req.params.id },
-    data: parsed.data,
+    data: {
+      ...rest,
+      ...(estimatedDelivery
+        ? { estimatedDelivery: new Date(estimatedDelivery) }
+        : {}),
+    },
   });
 
   res.json(updated);
