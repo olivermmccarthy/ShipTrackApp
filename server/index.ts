@@ -7,6 +7,8 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { Router } from 'express';
 import { z } from 'zod';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import {
   requireAuth,
   type AuthedRequest,
@@ -62,6 +64,14 @@ app.get('/api/shipments/:trackingNumber', async (req, res) => {
 });
 
 const port = process.env.PORT ?? 3001;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const clientDist = path.join(__dirname, '../client/dist');
+
+app.use(express.static(clientDist));
+
+app.get(/^(?!\/api).*/, (_req, res) => {
+  res.sendFile(path.join(clientDist, 'index.html'));
+});
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });

@@ -486,3 +486,13 @@ h2 {
 .skip-link:focus {
   left: 0;
 }
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.staff-link {
+  color: #fff;
+  text-decoration: none;
+  font-size: 0.9rem;
+}

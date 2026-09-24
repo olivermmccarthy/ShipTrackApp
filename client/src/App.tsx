@@ -21,6 +21,9 @@ return (
       <Link to="/" className="app-title">
         ShipTrack
       </Link>
+      <Link to="/staff/login" className="staff-link">
+        Staff login
+      </Link>
     </header>
     <main id="main-content" tabIndex={-1}>
       <Routes>
