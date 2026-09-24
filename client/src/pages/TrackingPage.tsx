@@ -231,7 +231,7 @@ function EnquiryForm({ trackingNumber }: { trackingNumber: string }) {
 
   if (status === 'success') {
     return (
-      <p className="enquiry-success">
+      <p className="enquiry-success" role="status">
         Thanks, your enquiry has been submitted. Our team will get back to you.
       </p>
     );

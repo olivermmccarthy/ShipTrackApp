@@ -171,7 +171,12 @@ function EditDetailsForm({
       <button type="submit" disabled={submitting}>
         {submitting ? 'Saving…' : 'Save details'}
       </button>
-      {saved && <span className="save-confirm"> Saved.</span>}
+      {saved && (
+        <span className="save-confirm" role="status">
+          {' '}
+          Saved.
+        </span>
+      )}
     </form>
   );
 }

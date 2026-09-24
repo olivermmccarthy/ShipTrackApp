@@ -19,7 +19,9 @@ export default function StaffLayout() {
         </div>
         <div className="staff-nav-right">
           <span>{staff?.email}</span>
-          <button onClick={handleLogout}>Log out</button>
+          <button type="button" onClick={handleLogout}>
+            Log out
+          </button>
         </div>
       </nav>
       <div className="staff-content">

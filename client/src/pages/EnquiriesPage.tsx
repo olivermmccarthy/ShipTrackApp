@@ -72,7 +72,7 @@ export default function EnquiriesPage() {
               {eq.category} · {new Date(eq.createdAt).toLocaleString('en-GB')}
             </div>
             <p>{eq.message}</p>
-            <button onClick={() => toggleState(eq)}>
+            <button type="button" onClick={() => toggleState(eq)}>
               Mark as {eq.state === 'OPEN' ? 'resolved' : 'open'}
             </button>
           </li>

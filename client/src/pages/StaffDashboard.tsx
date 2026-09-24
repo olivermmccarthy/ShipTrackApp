@@ -62,7 +62,7 @@ export default function StaffDashboard() {
     <div>
       <div className="dashboard-header">
         <h1>Shipments</h1>
-        <button onClick={() => setShowCreate((v) => !v)}>
+        <button type="button" onClick={() => setShowCreate((v) => !v)}>
           {showCreate ? 'Cancel' : 'Create shipment'}
         </button>
       </div>
