@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
+// Staff sign-in page for the internal operations area.
 export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -10,12 +11,15 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
+  // Submit credentials and redirect to the dashboard when authentication succeeds.
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitting(true);
     setError(null);
+
     const result = await login(email, password);
     setSubmitting(false);
+
     if (result.ok) {
       navigate('/staff');
     } else {

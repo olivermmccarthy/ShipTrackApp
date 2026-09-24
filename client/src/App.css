@@ -1,3 +1,4 @@
+/* Global reset and base app styling. */
 * {
   box-sizing: border-box;
 }
@@ -15,6 +16,7 @@ body {
   font-size: 16px;
 }
 
+/* Top navigation bar for the public and staff entry points. */
 .app-header {
   padding: 1rem;
   background: #1a2b4a;
@@ -36,6 +38,7 @@ body {
   font-size: 0.9rem;
 }
 
+/* Track-by-number page layout and search form. */
 .tracking-page {
   max-width: 1100px;
   margin: 0 auto;
@@ -112,6 +115,7 @@ body {
   color: #555;
 }
 
+/*Shipment summary and tracking history presentation. */
 .shipment-result {
   margin-top: 1.5rem;
 }
@@ -238,6 +242,7 @@ h2 {
   font-size: 0.95rem;
 }
 
+/* Enquiry form for customer questions related to a shipment. */
 .enquiry-form {
   max-width: 640px;
   margin-top: 2rem;
@@ -288,6 +293,8 @@ h2 {
   border-radius: 8px;
   color: #1c5e34;
 }
+
+/* Staff login form used for the internal operations portal. */
 .login-page {
   max-width: 320px;
   margin: 2rem auto 0;
@@ -322,6 +329,7 @@ h2 {
   cursor: default;
 }
 
+/* Staff dashboard navigation and layout panels. */
 .staff-nav {
   display: flex;
   align-items: center;
@@ -494,6 +502,7 @@ h2 {
   color: #7a1d10;
 }
 
+/* Detail and edit view styling for individual shipments. */
 .back-link { display: inline-block; margin-bottom: 1rem; color: #1a2b4a; text-decoration: none; font-weight: 600; }
 .detail-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; }
 .detail-header h1 { margin: 0; }

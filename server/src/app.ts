@@ -1,4 +1,5 @@
 import express from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import helmet from 'helmet';
 import { prisma } from './db.js';
 import cookieParser from 'cookie-parser';
@@ -468,4 +469,19 @@ staffRouter.patch('/enquiries/:id', async (req, res) => {
 });
 
 app.use('/api/staff', staffRouter);
+app.use('/api', (_req: Request, res: Response) => {
+  res.status(404).json({
+    error: { code: 'NOT_FOUND', message: 'No such API endpoint.' },
+  });
+});
+
+app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
+  console.error(err);
+  res.status(500).json({
+    error: {
+      code: 'INTERNAL_ERROR',
+      message: 'Something went wrong. Please try again.',
+    },
+  });
+});
 export default app;

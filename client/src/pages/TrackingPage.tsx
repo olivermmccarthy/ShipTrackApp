@@ -17,6 +17,7 @@ type Shipment = {
   }[];
 };
 
+// Human-friendly labels for the shipment lifecycle statuses returned by the API.
 const STATUS_LABELS: Record<string, string> = {
   CREATED: 'Created',
   COLLECTED: 'Collected',
@@ -34,6 +35,7 @@ export default function TrackingPage() {
   const [error, setError] = useState<string | null>(null);
   const [searched, setSearched] = useState(false);
 
+  // Search for a shipment by tracking number and render the result card if found.
   async function handleSearch(e: React.FormEvent) {
     e.preventDefault();
     const trimmed = input.trim();
@@ -61,6 +63,7 @@ export default function TrackingPage() {
         );
         return;
       }
+
       const data = await res.json();
       setShipment(data);
     } catch {
@@ -107,6 +110,7 @@ export default function TrackingPage() {
   );
 }
 
+// Render the current shipment summary and its event timeline for a customer.
 function ShipmentResult({ shipment }: { shipment: Shipment }) {
   const isDelayed = shipment.status === 'DELAYED';
   const etaChanged =
@@ -181,6 +185,7 @@ function ShipmentResult({ shipment }: { shipment: Shipment }) {
   );
 }
 
+// Format dates for the customer-facing delivery summary.
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-GB', {
     day: 'numeric',
@@ -189,6 +194,7 @@ function formatDate(iso: string) {
   });
 }
 
+// Format timestamps for the event history list.
 function formatDateTime(iso: string) {
   return new Date(iso).toLocaleString('en-GB', {
     day: 'numeric',
@@ -199,10 +205,12 @@ function formatDateTime(iso: string) {
   });
 }
 
+// Convert API keys like "estimatedDelivery" into readable labels.
 function formatKey(key: string) {
   return key.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase());
 }
 
+// Customer enquiry form attached beneath a shipment result.
 function EnquiryForm({ trackingNumber }: { trackingNumber: string }) {
   const [category, setCategory] = useState('General Question');
   const [message, setMessage] = useState('');
