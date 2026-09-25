@@ -13,6 +13,7 @@ export default function EnquiriesPage() {
   const [enquiries, setEnquiries] = useState<Enquiry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [filter, setFilter] = useState<'ALL' | 'OPEN' | 'RESOLVED'>('ALL');
 
   async function load() {
     setLoading(true);
@@ -43,25 +44,44 @@ export default function EnquiriesPage() {
     load();
   }
 
+  if (loading) return <p className="hint">Loading enquiries…</p>;
+  if (error)
+    return (
+      <p className="error-message" role="alert">
+        Couldn't load enquiries.
+      </p>
+    );
+
+  const filtered =
+    filter === 'ALL'
+      ? enquiries
+      : enquiries.filter((eq) => eq.state === filter);
+
   return (
     <div>
       <h1>Enquiries</h1>
-      {loading && (
-        <p className="hint" role="status" aria-live="polite">
-          Loading enquiries…
-        </p>
+
+      <div className="filter-bar">
+        <select
+          value={filter}
+          onChange={(e) =>
+            setFilter(e.target.value as 'ALL' | 'OPEN' | 'RESOLVED')
+          }
+        >
+          <option value="ALL">All enquiries</option>
+          <option value="OPEN">Open</option>
+          <option value="RESOLVED">Resolved</option>
+        </select>
+      </div>
+
+      {enquiries.length === 0 && <p className="hint">No enquiries yet.</p>}
+      {enquiries.length > 0 && filtered.length === 0 && (
+        <p className="hint">No enquiries match this filter.</p>
       )}
-      {error && (
-        <p className="error-message" role="alert">
-          Couldn't load enquiries.
-        </p>
-      )}
-      {!loading && !error && enquiries.length === 0 && (
-        <p className="hint">No enquiries yet.</p>
-      )}
-      {!loading && !error && enquiries.length > 0 && (
+
+      {filtered.length > 0 && (
         <ul className="enquiry-list">
-          {enquiries.map((eq) => (
+          {filtered.map((eq) => (
             <li key={eq.id} className="panel">
               <div className="enquiry-top">
                 <span className="shipment-card-tracking">
@@ -77,11 +97,7 @@ export default function EnquiriesPage() {
                 {eq.category} · {new Date(eq.createdAt).toLocaleString('en-GB')}
               </div>
               <p>{eq.message}</p>
-              <button
-                type="button"
-                aria-label={`Mark enquiry for ${eq.trackingNumber} as ${eq.state === 'OPEN' ? 'resolved' : 'open'}`}
-                onClick={() => toggleState(eq)}
-              >
+              <button onClick={() => toggleState(eq)}>
                 Mark as {eq.state === 'OPEN' ? 'resolved' : 'open'}
               </button>
             </li>

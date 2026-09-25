@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import TruckLoader from '../components/TruckLoader';
 
 type Shipment = {
   trackingNumber: string;
@@ -17,7 +18,6 @@ type Shipment = {
   }[];
 };
 
-// Human-friendly labels for the shipment lifecycle statuses returned by the API.
 const STATUS_LABELS: Record<string, string> = {
   CREATED: 'Created',
   COLLECTED: 'Collected',
@@ -28,6 +28,20 @@ const STATUS_LABELS: Record<string, string> = {
   EXCEPTION: 'Exception',
 };
 
+// Tracking numbers are letters, digits and dashes only, 4-30 chars.
+// Deliberately not requiring a "TRK-" prefix specifically, since staff
+// can supply their own custom tracking number on creation.
+const TRACKING_NUMBER_PATTERN = /^[A-Za-z0-9-]{4,30}$/;
+
+// Minimum time the loading state stays visible, even if the real request
+// is faster. Makes the loading state actually demonstrable, and leaves
+// room to swap the placeholder truck below for a real animation later.
+const MIN_SEARCH_DELAY_MS = 1200;
+
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export default function TrackingPage() {
   const [input, setInput] = useState('');
   const [shipment, setShipment] = useState<Shipment | null>(null);
@@ -35,12 +49,17 @@ export default function TrackingPage() {
   const [error, setError] = useState<string | null>(null);
   const [searched, setSearched] = useState(false);
 
-  // Search for a shipment by tracking number and render the result card if found.
   async function handleSearch(e: React.FormEvent) {
     e.preventDefault();
     const trimmed = input.trim();
     if (!trimmed) {
       setError('Please enter a tracking number.');
+      return;
+    }
+    if (!TRACKING_NUMBER_PATTERN.test(trimmed)) {
+      setError(
+        "That doesn't look like a valid tracking number. Use only letters, numbers and dashes.",
+      );
       return;
     }
 
@@ -50,7 +69,10 @@ export default function TrackingPage() {
     setSearched(true);
 
     try {
-      const res = await fetch(`/api/shipments/${encodeURIComponent(trimmed)}`);
+      const [res] = await Promise.all([
+        fetch(`/api/shipments/${encodeURIComponent(trimmed)}`),
+        delay(MIN_SEARCH_DELAY_MS),
+      ]);
       if (res.status === 404) {
         setError(
           "We couldn't find a shipment with that tracking number. Please check and try again.",
@@ -63,7 +85,6 @@ export default function TrackingPage() {
         );
         return;
       }
-
       const data = await res.json();
       setShipment(data);
     } catch {
@@ -81,23 +102,31 @@ export default function TrackingPage() {
       <form onSubmit={handleSearch} className="tracking-form">
         <label htmlFor="trackingNumber">Tracking number</label>
         <div className="tracking-form-row">
-          <input
-            id="trackingNumber"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="e.g. TRK-DEMO-001"
-          />
+          <div className="search-input-wrap">
+            <input
+              id="trackingNumber"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="e.g. TRK-DEMO-001"
+            />
+            {input && (
+              <button
+                type="button"
+                className="clear-btn"
+                aria-label="Clear tracking number"
+                onClick={() => setInput('')}
+              >
+                ×
+              </button>
+            )}
+          </div>
           <button type="submit" disabled={loading}>
             {loading ? 'Searching…' : 'Track'}
           </button>
         </div>
       </form>
 
-      {loading && (
-        <p className="hint" role="status" aria-live="polite">
-          Searching for shipment…
-        </p>
-      )}
+      {loading && <TruckLoader />}
 
       {error && (
         <p className="error-message" role="alert">
@@ -116,7 +145,6 @@ export default function TrackingPage() {
   );
 }
 
-// Render the current shipment summary and its event timeline for a customer.
 function ShipmentResult({ shipment }: { shipment: Shipment }) {
   const isDelayed = shipment.status === 'DELAYED';
   const etaChanged =
@@ -124,9 +152,6 @@ function ShipmentResult({ shipment }: { shipment: Shipment }) {
 
   return (
     <div className="shipment-result">
-      <p className="visually-hidden" role="status" aria-live="polite">
-        Shipment details loaded for {shipment.trackingNumber}.
-      </p>
       <div className={`status-banner status-${shipment.status.toLowerCase()}`}>
         <span className="status-label">
           {STATUS_LABELS[shipment.status] ?? shipment.status}
@@ -194,7 +219,6 @@ function ShipmentResult({ shipment }: { shipment: Shipment }) {
   );
 }
 
-// Format dates for the customer-facing delivery summary.
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-GB', {
     day: 'numeric',
@@ -203,7 +227,6 @@ function formatDate(iso: string) {
   });
 }
 
-// Format timestamps for the event history list.
 function formatDateTime(iso: string) {
   return new Date(iso).toLocaleString('en-GB', {
     day: 'numeric',
@@ -214,12 +237,10 @@ function formatDateTime(iso: string) {
   });
 }
 
-// Convert API keys like "estimatedDelivery" into readable labels.
 function formatKey(key: string) {
   return key.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase());
 }
 
-// Customer enquiry form attached beneath a shipment result.
 function EnquiryForm({ trackingNumber }: { trackingNumber: string }) {
   const [category, setCategory] = useState('General Question');
   const [message, setMessage] = useState('');

@@ -81,19 +81,25 @@ export default function StaffDashboard() {
         />
       )}
 
-      <form onSubmit={handleFilterSubmit} className="filter-bar" role="search">
-        <input
-          id="shipment-search"
-          aria-label="Search by tracking number"
-          placeholder="Search tracking number…"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-        />
-        <select
-          aria-label="Filter shipments by status"
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-        >
+      <form onSubmit={handleFilterSubmit} className="filter-bar">
+        <div className="search-input-wrap">
+          <input
+            placeholder="Search tracking number…"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+          />
+          {q && (
+            <button
+              type="button"
+              className="clear-btn"
+              aria-label="Clear search"
+              onClick={() => setQ('')}
+            >
+              ×
+            </button>
+          )}
+        </div>
+        <select value={status} onChange={(e) => setStatus(e.target.value)}>
           <option value="">All statuses</option>
           {Object.entries(STATUS_LABELS).map(([value, label]) => (
             <option key={value} value={value}>

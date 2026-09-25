@@ -1,4 +1,5 @@
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route, Link, useLocation } from 'react-router-dom';
+import { useAuth } from './context/AuthContext';
 import './App.css';
 import TrackingPage from './pages/TrackingPage';
 import LoginPage from './pages/LoginPage';
@@ -11,6 +12,9 @@ import { useFocusMainOnRouteChange } from './hooks/useFocusMainOnRouteChange';
 
 // Main app shell for the public tracking flow and staff-only area.
 export default function App() {
+const location = useLocation();
+const isStaffArea = location.pathname.startsWith('/staff');
+const { staff } = useAuth();
   // Keep focus on the main content whenever the route changes for accessibility.
   useFocusMainOnRouteChange();
 
@@ -25,9 +29,11 @@ export default function App() {
         <Link to="/" className="app-title">
           ShipTrack
         </Link>
-        <Link to="/staff/login" className="staff-link">
-          Staff login
-        </Link>
+        {!isStaffArea && (
+          <Link to="/staff" className="staff-link">
+            {staff ? 'Staff portal' : 'Staff login'}
+          </Link>
+        )}
       </header>
 
       <main id="main-content" tabIndex={-1}>
