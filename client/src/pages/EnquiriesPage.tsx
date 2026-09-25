@@ -43,41 +43,51 @@ export default function EnquiriesPage() {
     load();
   }
 
-  if (loading) return <p className="hint">Loading enquiries…</p>;
-  if (error)
-    return (
-      <p className="error-message" role="alert">
-        Couldn't load enquiries.
-      </p>
-    );
-  if (enquiries.length === 0) return <p className="hint">No enquiries yet.</p>;
-
   return (
     <div>
       <h1>Enquiries</h1>
-      <ul className="enquiry-list">
-        {enquiries.map((eq) => (
-          <li key={eq.id} className="panel">
-            <div className="enquiry-top">
-              <span className="shipment-card-tracking">
-                {eq.trackingNumber}
-              </span>
-              <span
-                className={`status-pill ${eq.state === 'OPEN' ? 'status-delayed' : 'status-delivered'}`}
+      {loading && (
+        <p className="hint" role="status" aria-live="polite">
+          Loading enquiries…
+        </p>
+      )}
+      {error && (
+        <p className="error-message" role="alert">
+          Couldn't load enquiries.
+        </p>
+      )}
+      {!loading && !error && enquiries.length === 0 && (
+        <p className="hint">No enquiries yet.</p>
+      )}
+      {!loading && !error && enquiries.length > 0 && (
+        <ul className="enquiry-list">
+          {enquiries.map((eq) => (
+            <li key={eq.id} className="panel">
+              <div className="enquiry-top">
+                <span className="shipment-card-tracking">
+                  {eq.trackingNumber}
+                </span>
+                <span
+                  className={`status-pill ${eq.state === 'OPEN' ? 'status-delayed' : 'status-delivered'}`}
+                >
+                  {eq.state === 'OPEN' ? 'Open' : 'Resolved'}
+                </span>
+              </div>
+              <div className="hint">
+                {eq.category} · {new Date(eq.createdAt).toLocaleString('en-GB')}
+              </div>
+              <p>{eq.message}</p>
+              <button
+                type="button"
+                aria-label={`Mark enquiry for ${eq.trackingNumber} as ${eq.state === 'OPEN' ? 'resolved' : 'open'}`}
+                onClick={() => toggleState(eq)}
               >
-                {eq.state === 'OPEN' ? 'Open' : 'Resolved'}
-              </span>
-            </div>
-            <div className="hint">
-              {eq.category} · {new Date(eq.createdAt).toLocaleString('en-GB')}
-            </div>
-            <p>{eq.message}</p>
-            <button type="button" onClick={() => toggleState(eq)}>
-              Mark as {eq.state === 'OPEN' ? 'resolved' : 'open'}
-            </button>
-          </li>
-        ))}
-      </ul>
+                Mark as {eq.state === 'OPEN' ? 'resolved' : 'open'}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

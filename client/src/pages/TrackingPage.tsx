@@ -93,6 +93,12 @@ export default function TrackingPage() {
         </div>
       </form>
 
+      {loading && (
+        <p className="hint" role="status" aria-live="polite">
+          Searching for shipment…
+        </p>
+      )}
+
       {error && (
         <p className="error-message" role="alert">
           {error}
@@ -118,6 +124,9 @@ function ShipmentResult({ shipment }: { shipment: Shipment }) {
 
   return (
     <div className="shipment-result">
+      <p className="visually-hidden" role="status" aria-live="polite">
+        Shipment details loaded for {shipment.trackingNumber}.
+      </p>
       <div className={`status-banner status-${shipment.status.toLowerCase()}`}>
         <span className="status-label">
           {STATUS_LABELS[shipment.status] ?? shipment.status}

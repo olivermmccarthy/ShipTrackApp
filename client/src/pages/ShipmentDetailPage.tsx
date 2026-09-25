@@ -59,7 +59,12 @@ export default function ShipmentDetailPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  if (loading) return <p className="hint">Loading shipment…</p>;
+  if (loading)
+    return (
+      <p className="hint" role="status" aria-live="polite">
+        Loading shipment…
+      </p>
+    );
   if (error || !shipment)
     return (
       <p className="error-message" role="alert">
@@ -160,46 +165,62 @@ function EditDetailsForm({
       <label htmlFor="origin">Origin</label>
       <input
         id="origin"
+        aria-invalid={Boolean(fieldErrors.origin)}
+        aria-describedby={fieldErrors.origin ? 'edit-origin-error' : undefined}
         value={origin}
         onChange={(e) => setOrigin(e.target.value)}
         required
       />
       {fieldErrors.origin && (
-        <p className="field-error">{fieldErrors.origin[0]}</p>
+        <p className="field-error" id="edit-origin-error">
+          {fieldErrors.origin[0]}
+        </p>
       )}
 
       <label htmlFor="destination">Destination</label>
       <input
         id="destination"
+        aria-invalid={Boolean(fieldErrors.destination)}
+        aria-describedby={fieldErrors.destination ? 'edit-destination-error' : undefined}
         value={destination}
         onChange={(e) => setDestination(e.target.value)}
         required
       />
       {fieldErrors.destination && (
-        <p className="field-error">{fieldErrors.destination[0]}</p>
+        <p className="field-error" id="edit-destination-error">
+          {fieldErrors.destination[0]}
+        </p>
       )}
 
       <label htmlFor="currentLocation">Current location</label>
       <input
         id="currentLocation"
+        aria-invalid={Boolean(fieldErrors.currentLocation)}
+        aria-describedby={fieldErrors.currentLocation ? 'edit-location-error' : undefined}
         value={currentLocation}
         onChange={(e) => setCurrentLocation(e.target.value)}
         required
       />
       {fieldErrors.currentLocation && (
-        <p className="field-error">{fieldErrors.currentLocation[0]}</p>
+        <p className="field-error" id="edit-location-error">
+          {fieldErrors.currentLocation[0]}
+        </p>
       )}
 
       <label htmlFor="estimatedDelivery">Estimated delivery</label>
       <input
         id="estimatedDelivery"
         type="date"
+        aria-invalid={Boolean(fieldErrors.estimatedDelivery)}
+        aria-describedby={fieldErrors.estimatedDelivery ? 'edit-delivery-error' : undefined}
         value={estimatedDelivery}
         onChange={(e) => setEstimatedDelivery(e.target.value)}
         required
       />
       {fieldErrors.estimatedDelivery && (
-        <p className="field-error">{fieldErrors.estimatedDelivery[0]}</p>
+        <p className="field-error" id="edit-delivery-error">
+          {fieldErrors.estimatedDelivery[0]}
+        </p>
       )}
 
       <button type="submit" disabled={submitting}>
@@ -372,7 +393,9 @@ function NotesSection({
         ))}
       </ul>
       <form onSubmit={handleSubmit}>
+        <label htmlFor="internal-note">Note</label>
         <textarea
+          id="internal-note"
           value={body}
           onChange={(e) => setBody(e.target.value)}
           rows={2}

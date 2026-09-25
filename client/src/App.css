@@ -45,6 +45,12 @@ body {
   text-decoration: none;
   font-size: 0.9rem;
 }
+.staff-link,
+.staff-nav a,
+.back-link {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
 
 /* Track-by-number page layout and search form. */
 .tracking-page {
@@ -92,7 +98,7 @@ body {
   min-width: 0;
   padding: 0.65rem 0.75rem;
   font-size: 1rem;
-  border: 1px solid #ccc;
+  border: 1px solid #767676;
   border-radius: 6px;
 }
 
@@ -277,7 +283,7 @@ h2 {
   width: 100%;
   padding: 0.6rem 0.7rem;
   font-size: 1rem;
-  border: 1px solid #ccc;
+  border: 1px solid #767676;
   border-radius: 6px;
   font-family: inherit;
 }
@@ -323,7 +329,7 @@ h2 {
   width: 100%;
   padding: 0.6rem 0.7rem;
   font-size: 1rem;
-  border: 1px solid #ccc;
+  border: 1px solid #767676;
   border-radius: 6px;
 }
 .login-form button {
@@ -357,7 +363,8 @@ h2 {
 .staff-nav a {
   color: var(--accent-text);
   font-weight: 600;
-  text-decoration: none;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
   margin-right: 1rem;
 }
 .staff-nav-right {
@@ -370,7 +377,7 @@ h2 {
   padding: 0.4rem 0.8rem;
   font-size: 0.9rem;
   background: #fff;
-  border: 1px solid #ccc;
+  border: 1px solid #767676;
   border-radius: 6px;
   cursor: pointer;
 }
@@ -423,7 +430,7 @@ h2 {
   width: 100%;
   padding: 0.55rem 0.7rem;
   font-size: 1rem;
-  border: 1px solid #ccc;
+  border: 1px solid #767676;
   border-radius: 6px;
 }
 .create-form button:disabled {
@@ -441,7 +448,7 @@ h2 {
 .filter-bar select {
   padding: 0.5rem 0.6rem;
   font-size: 0.95rem;
-  border: 1px solid #ccc;
+  border: 1px solid #767676;
   border-radius: 6px;
 }
 .filter-bar input {
@@ -523,7 +530,7 @@ h2 {
 }
 
 /* Detail and edit view styling for individual shipments. */
-.back-link { display: inline-block; margin-bottom: 1rem; color: var(--accent-text); text-decoration: none; font-weight: 600; }
+.back-link { display: inline-block; margin-bottom: 1rem; color: var(--accent-text); font-weight: 600; }
 .detail-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; }
 .detail-header h1 { margin: 0; }
 
@@ -532,7 +539,7 @@ h2 {
 }
 .panel label { display: block; font-weight: 600; margin: 0.6rem 0 0.25rem; }
 .panel input, .panel select, .panel textarea {
-  display: block; width: 100%; max-width: 480px; padding: 0.55rem 0.7rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 6px; font-family: inherit;
+  display: block; width: 100%; max-width: 480px; padding: 0.55rem 0.7rem; font-size: 1rem; border: 1px solid #767676; border-radius: 6px; font-family: inherit;
 }
 .panel button {
   display: block;
@@ -571,6 +578,17 @@ h2 {
 }
 .skip-link:focus {
   left: 0;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 .field-error {
   margin: 0.25rem 0 0;
@@ -639,4 +657,15 @@ textarea:focus-visible {
 }
 .enquiry-list .panel:hover {
   box-shadow: 0 4px 14px rgba(26, 43, 74, 0.1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

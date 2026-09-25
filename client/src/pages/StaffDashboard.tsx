@@ -62,7 +62,12 @@ export default function StaffDashboard() {
     <div>
       <div className="dashboard-header">
         <h1>Shipments</h1>
-        <button type="button" onClick={() => setShowCreate((v) => !v)}>
+        <button
+          type="button"
+          aria-expanded={showCreate}
+          aria-controls="create-shipment-form"
+          onClick={() => setShowCreate((v) => !v)}
+        >
           {showCreate ? 'Cancel' : 'Create shipment'}
         </button>
       </div>
@@ -76,13 +81,19 @@ export default function StaffDashboard() {
         />
       )}
 
-      <form onSubmit={handleFilterSubmit} className="filter-bar">
+      <form onSubmit={handleFilterSubmit} className="filter-bar" role="search">
         <input
+          id="shipment-search"
+          aria-label="Search by tracking number"
           placeholder="Search tracking number…"
           value={q}
           onChange={(e) => setQ(e.target.value)}
         />
-        <select value={status} onChange={(e) => setStatus(e.target.value)}>
+        <select
+          aria-label="Filter shipments by status"
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+        >
           <option value="">All statuses</option>
           {Object.entries(STATUS_LABELS).map(([value, label]) => (
             <option key={value} value={value}>
@@ -93,7 +104,11 @@ export default function StaffDashboard() {
         <button type="submit">Apply</button>
       </form>
 
-      {loading && <p className="hint">Loading shipments…</p>}
+      {loading && (
+        <p className="hint" role="status" aria-live="polite">
+          Loading shipments…
+        </p>
+      )}
       {error && (
         <p className="error-message" role="alert">
           Couldn't load shipments. Please try again.
@@ -174,51 +189,71 @@ function CreateShipmentForm({ onCreated }: { onCreated: () => void }) {
    }
 
   return (
-    <form onSubmit={handleSubmit} className="create-form">
+      <form
+        id="create-shipment-form"
+        onSubmit={handleSubmit}
+        className="create-form"
+      >
       <h2>New shipment</h2>
       <label htmlFor="origin">Origin</label>
       <input
         id="origin"
+        aria-invalid={Boolean(fieldErrors.origin)}
+        aria-describedby={fieldErrors.origin ? 'create-origin-error' : undefined}
         value={origin}
         onChange={(e) => setOrigin(e.target.value)}
         required
       />
       {fieldErrors.origin && (
-        <p className="field-error">{fieldErrors.origin[0]}</p>
+        <p className="field-error" id="create-origin-error">
+          {fieldErrors.origin[0]}
+        </p>
       )}
 
       <label htmlFor="destination">Destination</label>
       <input
         id="destination"
+        aria-invalid={Boolean(fieldErrors.destination)}
+        aria-describedby={fieldErrors.destination ? 'create-destination-error' : undefined}
         value={destination}
         onChange={(e) => setDestination(e.target.value)}
         required
       />
       {fieldErrors.destination && (
-        <p className="field-error">{fieldErrors.destination[0]}</p>
+        <p className="field-error" id="create-destination-error">
+          {fieldErrors.destination[0]}
+        </p>
       )}
 
       <label htmlFor="currentLocation">Current location</label>
       <input
         id="currentLocation"
+        aria-invalid={Boolean(fieldErrors.currentLocation)}
+        aria-describedby={fieldErrors.currentLocation ? 'create-location-error' : undefined}
         value={currentLocation}
         onChange={(e) => setCurrentLocation(e.target.value)}
         required
       />
       {fieldErrors.currentLocation && (
-        <p className="field-error">{fieldErrors.currentLocation[0]}</p>
+        <p className="field-error" id="create-location-error">
+          {fieldErrors.currentLocation[0]}
+        </p>
       )}
 
       <label htmlFor="estimatedDelivery">Estimated delivery</label>
       <input
         id="estimatedDelivery"
         type="date"
+        aria-invalid={Boolean(fieldErrors.estimatedDelivery)}
+        aria-describedby={fieldErrors.estimatedDelivery ? 'create-delivery-error' : undefined}
         value={estimatedDelivery}
         onChange={(e) => setEstimatedDelivery(e.target.value)}
         required
       />
       {fieldErrors.estimatedDelivery && (
-        <p className="field-error">{fieldErrors.estimatedDelivery[0]}</p>
+        <p className="field-error" id="create-delivery-error">
+          {fieldErrors.estimatedDelivery[0]}
+        </p>
       )}
 
       {error && (

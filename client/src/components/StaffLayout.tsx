@@ -12,7 +12,7 @@ export default function StaffLayout() {
 
   return (
     <div className="staff-layout">
-      <nav className="staff-nav">
+      <nav className="staff-nav" aria-label="Staff navigation">
         <div>
           <Link to="/staff">Shipments</Link>
           <Link to="/staff/enquiries">Enquiries</Link>
