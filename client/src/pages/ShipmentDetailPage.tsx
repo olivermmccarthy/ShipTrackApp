@@ -124,11 +124,13 @@ function EditDetailsForm({
   );
   const [submitting, setSubmitting] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitting(true);
     setSaved(false);
+    setFieldErrors({});
     try {
       const res = await fetch(`/api/staff/shipments/${shipment.id}`, {
         method: 'PATCH',
@@ -143,6 +145,9 @@ function EditDetailsForm({
       if (res.ok) {
         setSaved(true);
         onSaved();
+      } else {
+        const data = await res.json().catch(() => null);
+        setFieldErrors(data?.error?.fields ?? {});
       }
     } finally {
       setSubmitting(false);
@@ -159,6 +164,9 @@ function EditDetailsForm({
         onChange={(e) => setOrigin(e.target.value)}
         required
       />
+      {fieldErrors.origin && (
+        <p className="field-error">{fieldErrors.origin[0]}</p>
+      )}
 
       <label htmlFor="destination">Destination</label>
       <input
@@ -167,14 +175,36 @@ function EditDetailsForm({
         onChange={(e) => setDestination(e.target.value)}
         required
       />
+      {fieldErrors.destination && (
+        <p className="field-error">{fieldErrors.destination[0]}</p>
+      )}
 
       <label htmlFor="currentLocation">Current location</label>
-      <input id="currentLocation" value={currentLocation} onChange={(e) => setCurrentLocation(e.target.value)} required />
+      <input
+        id="currentLocation"
+        value={currentLocation}
+        onChange={(e) => setCurrentLocation(e.target.value)}
+        required
+      />
+      {fieldErrors.currentLocation && (
+        <p className="field-error">{fieldErrors.currentLocation[0]}</p>
+      )}
 
       <label htmlFor="estimatedDelivery">Estimated delivery</label>
-      <input id="estimatedDelivery" type="date" value={estimatedDelivery} onChange={(e) => setEstimatedDelivery(e.target.value)} required />
+      <input
+        id="estimatedDelivery"
+        type="date"
+        value={estimatedDelivery}
+        onChange={(e) => setEstimatedDelivery(e.target.value)}
+        required
+      />
+      {fieldErrors.estimatedDelivery && (
+        <p className="field-error">{fieldErrors.estimatedDelivery[0]}</p>
+      )}
 
-      <button type="submit" disabled={submitting}>{submitting ? "Saving…" : "Save details"}</button>
+      <button type="submit" disabled={submitting}>
+        {submitting ? 'Saving…' : 'Save details'}
+      </button>
       {saved && (
         <span className="save-confirm" role="status">
           {' '}
@@ -198,11 +228,13 @@ function AddEventForm({
   const [newEta, setNewEta] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitting(true);
     setError(null);
+    setFieldErrors({});
     try {
       const res = await fetch(`/api/staff/shipments/${shipmentId}/events`, {
         method: 'POST',
@@ -219,6 +251,7 @@ function AddEventForm({
       if (!res.ok) {
         const data = await res.json().catch(() => null);
         setError(data?.error?.message ?? "Couldn't add event.");
+        setFieldErrors(data?.error?.fields ?? {});
         return;
       }
       setLocation('');
@@ -253,6 +286,9 @@ function AddEventForm({
         onChange={(e) => setLocation(e.target.value)}
         required
       />
+      {fieldErrors.location && (
+        <p className="field-error">{fieldErrors.location[0]}</p>
+      )}
 
       <label htmlFor="eventMessage">Message</label>
       <textarea
@@ -262,6 +298,9 @@ function AddEventForm({
         rows={2}
         required
       />
+      {fieldErrors.message && (
+        <p className="field-error">{fieldErrors.message[0]}</p>
+      )}
 
       {status === 'DELAYED' && (
         <>

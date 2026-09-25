@@ -142,33 +142,36 @@ function CreateShipmentForm({ onCreated }: { onCreated: () => void }) {
   const [currentLocation, setCurrentLocation] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setSubmitting(true);
-    setError(null);
+   async function handleSubmit(e: React.FormEvent) {
+     e.preventDefault();
+     setSubmitting(true);
+     setError(null);
+     setFieldErrors({});
 
-    try {
-      const res = await fetch('/api/staff/shipments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          origin,
-          destination,
-          currentLocation,
-          estimatedDelivery: new Date(estimatedDelivery).toISOString(),
-        }),
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => null);
-        setError(data?.error?.message ?? "Couldn't create shipment.");
-        return;
-      }
-      onCreated();
-    } finally {
-      setSubmitting(false);
-    }
-  }
+     try {
+       const res = await fetch('/api/staff/shipments', {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({
+           origin,
+           destination,
+           currentLocation,
+           estimatedDelivery: new Date(estimatedDelivery).toISOString(),
+         }),
+       });
+       if (!res.ok) {
+         const data = await res.json().catch(() => null);
+         setError(data?.error?.message ?? "Couldn't create shipment.");
+         setFieldErrors(data?.error?.fields ?? {});
+         return;
+       }
+       onCreated();
+     } finally {
+       setSubmitting(false);
+     }
+   }
 
   return (
     <form onSubmit={handleSubmit} className="create-form">
@@ -180,6 +183,9 @@ function CreateShipmentForm({ onCreated }: { onCreated: () => void }) {
         onChange={(e) => setOrigin(e.target.value)}
         required
       />
+      {fieldErrors.origin && (
+        <p className="field-error">{fieldErrors.origin[0]}</p>
+      )}
 
       <label htmlFor="destination">Destination</label>
       <input
@@ -188,6 +194,9 @@ function CreateShipmentForm({ onCreated }: { onCreated: () => void }) {
         onChange={(e) => setDestination(e.target.value)}
         required
       />
+      {fieldErrors.destination && (
+        <p className="field-error">{fieldErrors.destination[0]}</p>
+      )}
 
       <label htmlFor="currentLocation">Current location</label>
       <input
@@ -196,6 +205,9 @@ function CreateShipmentForm({ onCreated }: { onCreated: () => void }) {
         onChange={(e) => setCurrentLocation(e.target.value)}
         required
       />
+      {fieldErrors.currentLocation && (
+        <p className="field-error">{fieldErrors.currentLocation[0]}</p>
+      )}
 
       <label htmlFor="estimatedDelivery">Estimated delivery</label>
       <input
@@ -205,6 +217,9 @@ function CreateShipmentForm({ onCreated }: { onCreated: () => void }) {
         onChange={(e) => setEstimatedDelivery(e.target.value)}
         required
       />
+      {fieldErrors.estimatedDelivery && (
+        <p className="field-error">{fieldErrors.estimatedDelivery[0]}</p>
+      )}
 
       {error && (
         <p className="error-message" role="alert">
