@@ -32,7 +32,9 @@ const STATUS_LABELS: Record<string, string> = {
 // Tracking numbers are letters, digits and dashes only, 4-30 chars.
 // Deliberately not requiring a "TRK-" prefix specifically, since staff
 // can supply their own custom tracking number on creation.
-const TRACKING_NUMBER_PATTERN = /^[A-Za-z0-9-]{4,30}$/;
+const TRACKING_NUMBER_CHARS_PATTERN = /^[A-Za-z0-9-]+$/;
+const MIN_TRACKING_NUMBER_LENGTH = 4;
+const MAX_TRACKING_NUMBER_LENGTH = 30;
 
 // Minimum time the loading state stays visible, even if the real request
 // is faster. Makes the loading state actually demonstrable, and leaves
@@ -57,9 +59,18 @@ export default function TrackingPage() {
       setError('Please enter a tracking number.');
       return;
     }
-    if (!TRACKING_NUMBER_PATTERN.test(trimmed)) {
+    if (
+      trimmed.length < MIN_TRACKING_NUMBER_LENGTH ||
+      trimmed.length > MAX_TRACKING_NUMBER_LENGTH
+    ) {
       setError(
-        "That doesn't look like a valid tracking number. Use only letters, numbers and dashes.",
+        `Tracking numbers are between ${MIN_TRACKING_NUMBER_LENGTH} and ${MAX_TRACKING_NUMBER_LENGTH} characters. Please check and try again.`,
+      );
+      return;
+    }
+    if (!TRACKING_NUMBER_CHARS_PATTERN.test(trimmed)) {
+      setError(
+        "That doesn't look like a valid tracking number. Please only use letters, numbers and dashes.",
       );
       return;
     }
@@ -98,50 +109,52 @@ export default function TrackingPage() {
   }
 
   return (
-    <div className="tracking-page">
-      <h1>Track your shipment</h1>
-      <form onSubmit={handleSearch} className="tracking-form">
-        <label htmlFor="trackingNumber">Tracking number</label>
-        <div className="tracking-form-row">
-          <div className="search-input-wrap">
-            <input
-              id="trackingNumber"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="e.g. TRK-DEMO-001"
-            />
-            {input && (
-              <button
-                type="button"
-                className="clear-btn"
-                aria-label="Clear tracking number"
-                onClick={() => setInput('')}
-              >
-                ×
-              </button>
-            )}
+    <div className="tracking-page-bg">
+      <div className="tracking-page">
+        <h1>Track your shipment</h1>
+        <form onSubmit={handleSearch} className="tracking-form">
+          <label htmlFor="trackingNumber">Tracking number</label>
+          <div className="tracking-form-row">
+            <div className="search-input-wrap">
+              <input
+                id="trackingNumber"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="e.g. TRK-DEMO-001"
+              />
+              {input && (
+                <button
+                  type="button"
+                  className="clear-btn"
+                  aria-label="Clear tracking number"
+                  onClick={() => setInput('')}
+                >
+                  ×
+                </button>
+              )}
+            </div>
+            <button type="submit" disabled={loading}>
+              {loading ? 'Searching…' : 'Track'}
+            </button>
           </div>
-          <button type="submit" disabled={loading}>
-            {loading ? 'Searching…' : 'Track'}
-          </button>
-        </div>
-      </form>
+        </form>
 
-      {loading && <TruckLoader />}
+        {loading && <TruckLoader />}
 
-      {error && (
-        <p className="error-message" role="alert">
-          {error}
-        </p>
-      )}
+        {error && (
+          <p className="error-message" role="alert">
+            {error}
+          </p>
+        )}
 
-      {shipment && <ShipmentResult shipment={shipment} />}
+        {shipment && <ShipmentResult shipment={shipment} />}
 
-      {!shipment && !error && !loading && searched === false && (
-        <p className="hint">
-          Enter a tracking number above to see your shipment's status.
-        </p>
-      )}
+        {!shipment && !error && !loading && searched === false && (
+          <p className="hint">
+            Enter a tracking number above to see your shipment's status.
+          </p>
+        )}
+      </div>
     </div>
   );
 }
