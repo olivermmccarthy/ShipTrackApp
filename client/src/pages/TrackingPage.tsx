@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import TruckLoader from '../components/TruckLoader';
+import StageTracker from '../components/StageTracker';
 
 type Shipment = {
   trackingNumber: string;
@@ -157,6 +158,8 @@ function ShipmentResult({ shipment }: { shipment: Shipment }) {
           {STATUS_LABELS[shipment.status] ?? shipment.status}
         </span>
       </div>
+
+      <StageTracker status={shipment.status} events={shipment.events} />
 
       <dl className="shipment-summary">
         <div>

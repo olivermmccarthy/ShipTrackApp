@@ -81,7 +81,7 @@ export default function StaffDashboard() {
         />
       )}
 
-      <form onSubmit={handleFilterSubmit} className="filter-bar">
+            <form onSubmit={handleFilterSubmit} className="filter-bar">
         <div className="search-input-wrap">
           <input
             placeholder="Search tracking number…"
@@ -93,7 +93,7 @@ export default function StaffDashboard() {
               type="button"
               className="clear-btn"
               aria-label="Clear search"
-              onClick={() => setQ('')}
+              onClick={() => setQ("")}
             >
               ×
             </button>

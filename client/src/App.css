@@ -177,7 +177,7 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 1.25rem 2rem;
-  margin: 0 0 1.5rem;
+    margin: 1.5rem 0;
   background: #fff;
   border-radius: 8px;
   padding: 1.25rem 1.5rem;
@@ -711,29 +711,40 @@ textarea:focus-visible {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 200px;
+  height: 160px;
 }
 
 .truck-svg {
-  width: 160px;
+  width: 150px;
   height: auto;
   overflow: visible;
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-.truck-body {
+.truck-outline {
   animation: drive-bounce 0.35s ease-in-out infinite alternate;
 }
 
 .wheel {
   animation: spin 0.7s linear infinite;
 }
-.wheel-back { transform-origin: 50px 150px; }
-.wheel-front { transform-origin: 135px 150px; }
+.wheel-back { transform-origin: 45px 88px; }
+.wheel-front { transform-origin: 125px 88px; }
 
-.exhaust-line {
-  animation: speed-dash 0.8s linear infinite;
+.ground-line {
+  stroke: #ccc;
+  stroke-dasharray: 4 6;
 }
-.exhaust-line:nth-child(2) {
+
+.motion-lines line {
+  animation: speed-dash 0.8s linear infinite;
+  opacity: 0;
+}
+.motion-lines line:nth-child(2) {
   animation-duration: 0.6s;
   animation-delay: 0.2s;
 }
@@ -754,7 +765,6 @@ textarea:focus-visible {
   70% { opacity: 1; }
   100% { transform: translateX(-35px); opacity: 0; }
 }
-
 .status-created {
   background: #eef1f7;
   border-color: #b7c2d6;
@@ -772,4 +782,171 @@ textarea:focus-visible {
 .status-pill.status-collected {
   background: #e6f6ec;
   color: #1e6b3c;
+}
+
+.stage-tracker {
+  display: flex;
+  list-style: none;
+  margin: 0 0 1.5rem;
+  padding: 1.5rem 1rem 1rem;
+  background: #fff;
+  border: 1px solid #e2e5eb;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.stage-item {
+  position: relative;
+  flex: 1;
+  min-width: 92px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.stage-item:not(:first-child)::before {
+  content: "";
+  position: absolute;
+  top: 14px;
+  left: 0;
+  width: 50%;
+  height: 3px;
+  background: #dcdfe6;
+  z-index: 0;
+}
+.stage-item:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 14px;
+  right: 0;
+  width: 50%;
+  height: 3px;
+  background: #dcdfe6;
+  z-index: 0;
+}
+
+.stage-item.conn-left-filled::before {
+  background: var(--accent);
+}
+.stage-item.conn-right-filled::after {
+  background: var(--accent);
+}
+
+.stage-node {
+  position: relative;
+  z-index: 1;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 3px solid #dcdfe6;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: #fff;
+}
+
+
+.stage-node.stage-done {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+.stage-check {
+  font-weight: 700;
+  line-height: 1;
+}
+
+.stage-node.stage-current {
+  border-color: var(--accent);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(109, 94, 248, 0.15);
+}
+.stage-pulse-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: stage-pulse 1.6s ease-in-out infinite;
+}
+
+.stage-node.stage-interrupted {
+  border-color: #d97706;
+  background: #fff;
+  color: #d97706;
+  font-weight: 700;
+}
+.stage-node.stage-interrupted::after {
+  content: "!";
+}
+
+.stage-label {
+  margin-top: 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #666;
+}
+.stage-item.stage-done .stage-label,
+.stage-item.stage-current .stage-label {
+  color: #1a1a1a;
+}
+.stage-item.stage-interrupted .stage-label {
+  color: #b45309;
+}
+
+.stage-sublabel {
+  margin-top: 0.15rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.stage-sublabel-delayed {
+  color: #b45309;
+}
+.stage-sublabel-exception {
+  color: #b3261e;
+}
+
+@keyframes stage-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.6; }
+}
+
+@media (max-width: 640px) {
+  .stage-tracker {
+    padding: 1.25rem 0.5rem 0.75rem;
+  }
+  .stage-item {
+    min-width: 60px;
+  }
+  .stage-node {
+    width: 22px;
+    height: 22px;
+    border-width: 2px;
+  }
+  .stage-item:not(:first-child)::before,
+  .stage-item:not(:last-child)::after {
+    top: 11px;
+  }
+  .stage-label {
+    font-size: 0.62rem;
+    margin-top: 0.35rem;
+  }
+  .stage-sublabel {
+    font-size: 0.6rem;
+  }
+}
+html, body {
+  overflow-x: hidden;
+}
+
+.tracking-page,
+.staff-content {
+  overflow-x: hidden;
+}
+
+.stage-tracker {
+  max-width: 100%;
 }
