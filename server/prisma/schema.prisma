@@ -59,6 +59,7 @@ model TrackingEvent {
   message    String
   occurredAt DateTime
   createdAt  DateTime       @default(now())
+  createdBy  String?
 
   shipment   Shipment @relation(fields: [shipmentId], references: [id])
   shipmentId String
@@ -68,6 +69,7 @@ model InternalNote {
   id        String   @id @default(uuid())
   body      String
   createdAt DateTime @default(now())
+  createdBy String?
 
   shipment   Shipment @relation(fields: [shipmentId], references: [id])
   shipmentId String

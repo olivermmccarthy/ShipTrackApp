@@ -390,6 +390,10 @@ staffRouter.post('/shipments/:id/events', async (req, res) => {
     });
   }
 
+  const staff = await prisma.staffUser.findUnique({
+    where: { id: (req as AuthedRequest).staffId },
+  });
+
   const [, updatedShipment] = await prisma.$transaction([
     prisma.trackingEvent.create({
       data: {
@@ -398,6 +402,7 @@ staffRouter.post('/shipments/:id/events', async (req, res) => {
         location: data.location,
         message: data.message,
         occurredAt,
+        createdBy: staff?.email,
       },
     }),
     prisma.shipment.update({
@@ -433,8 +438,12 @@ staffRouter.post('/shipments/:id/notes', async (req, res) => {
       .json({ error: { code: 'NOT_FOUND', message: 'Shipment not found.' } });
   }
 
+  const staff = await prisma.staffUser.findUnique({
+    where: { id: (req as AuthedRequest).staffId },
+  });
+
   const note = await prisma.internalNote.create({
-    data: { shipmentId: shipment.id, body },
+    data: { shipmentId: shipment.id, body, createdBy: staff?.email },
   });
   res.status(201).json(note);
 });
