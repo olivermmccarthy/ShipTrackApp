@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import TruckLoader from '../components/TruckLoader';
 import StageTracker from '../components/StageTracker';
+import ShipmentMap from '../components/ShipmentMap';
 
 type Shipment = {
   trackingNumber: string;
@@ -173,6 +174,15 @@ function ShipmentResult({ shipment }: { shipment: Shipment }) {
       </div>
 
       <StageTracker status={shipment.status} events={shipment.events} />
+
+      <div aria-hidden="true">
+        <h2>Route</h2>
+        <ShipmentMap
+          origin={shipment.origin}
+          destination={shipment.destination}
+          currentLocation={shipment.currentLocation}
+        />
+      </div>
 
       <h2>Tracking history</h2>
       {shipment.events.length === 0 ? (
