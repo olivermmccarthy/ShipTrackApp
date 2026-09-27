@@ -12,7 +12,16 @@ import { fileURLToPath } from 'url';
 import { requireAuth, type AuthedRequest } from './middleware/requireAuth.js';
 
 const app = express();
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+        'img-src': ["'self'", 'data:', 'https://*.tile.openstreetmap.org'],
+      },
+    },
+  }),
+);
 app.use(express.json());
 app.use(cookieParser());
 

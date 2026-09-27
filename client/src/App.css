@@ -667,7 +667,7 @@ textarea:focus-visible {
 .search-input-wrap {
   position: relative;
   flex: 1;
-  min-width: 0;
+  min-width: 180px;
 }
 
 .search-input-wrap input {
