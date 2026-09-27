@@ -4,3 +4,4 @@ dist
 *.log
 generated
 cookies.txt
+README.md

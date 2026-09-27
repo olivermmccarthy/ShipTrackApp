@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { getCoordinates } from '../data/cityCoordinates';
@@ -25,9 +25,11 @@ export default function ShipmentMap({
 }: ShipmentMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
+  const [tilesUnavailable, setTilesUnavailable] = useState(false);
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
+    setTilesUnavailable(false);
 
     const originCoords = getCoordinates(origin);
     const destinationCoords = getCoordinates(destination);
@@ -41,11 +43,23 @@ export default function ShipmentMap({
     const map = L.map(containerRef.current, { scrollWheelZoom: false });
     mapRef.current = map;
 
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    const tileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       maxZoom: 18,
-    }).addTo(map);
+    });
+    let tileLoadFailed = false;
+    const handleTileError = () => {
+      if (tileLoadFailed) return;
+      tileLoadFailed = true;
+      setTilesUnavailable(true);
+      tileLayer.off('tileerror', handleTileError);
+      if (mapRef.current === map) {
+        map.remove();
+        mapRef.current = null;
+      }
+    };
+    tileLayer.on('tileerror', handleTileError).addTo(map);
 
     if (originCoords) {
       L.marker(originCoords, { icon: createMarkerIcon('#888', 14) })
@@ -79,8 +93,11 @@ export default function ShipmentMap({
     }
 
     return () => {
-      map.remove();
-      mapRef.current = null;
+      tileLayer.off('tileerror', handleTileError);
+      if (mapRef.current === map) {
+        map.remove();
+        mapRef.current = null;
+      }
     };
   }, [origin, destination, currentLocation]);
 
@@ -97,5 +114,22 @@ export default function ShipmentMap({
     );
   }
 
-  return <div ref={containerRef} className="shipment-map" />;
+  return (
+    <div className="shipment-map-frame">
+      <div
+        ref={containerRef}
+        className="shipment-map"
+        aria-label={`Route map from ${origin} to ${destination}; current location ${currentLocation}`}
+        aria-hidden={tilesUnavailable}
+      />
+      {tilesUnavailable && (
+        <div className="map-unavailable" role="status">
+          <strong>Route map unavailable</strong>
+          <span>
+            {origin} to {destination}. Current location: {currentLocation}.
+          </span>
+        </div>
+      )}
+    </div>
+  );
 }

@@ -61,7 +61,7 @@ body {
 
 .tracking-page h1 {
   text-align: center;
-  font-size: 1.9rem;
+  font-size: 2rem;
   margin-bottom: 1.5rem;
   font-family: var(--heading-font);
   font-weight: 700;
@@ -145,11 +145,15 @@ body {
   border: 2px solid transparent;
 }
 
-.status-created,
-.status-collected {
+.status-created {
   background: #eef1f7;
   border-color: #b7c2d6;
   color: #2b3b58;
+}
+.status-collected {
+  background: #e6f6ec;
+  border-color: #93d6ab;
+  color: #1e6b3c;
 }
 .status-in_transit,
 .status-out_for_delivery {
@@ -185,7 +189,7 @@ body {
 }
 
 .shipment-summary dt {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   color: #666;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -203,7 +207,7 @@ body {
 }
 
 h2 {
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   margin: 1.5rem 0 0.75rem;
   font-family: var(--heading-font);
   font-weight: 600;
@@ -259,7 +263,7 @@ h2 {
 
 .timeline-message {
   margin-top: 0.3rem;
-  font-size: 0.95rem;
+  font-size: 1rem;
 }
 
 /* Enquiry form for customer questions related to a shipment. */
@@ -389,7 +393,7 @@ h2 {
 
 .staff-content h1 {
   text-align: left;
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   margin: 0 0 1.25rem;
   font-family: var(--heading-font);
   font-weight: 700;
@@ -447,7 +451,7 @@ h2 {
 .filter-bar input,
 .filter-bar select {
   padding: 0.5rem 0.6rem;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   border: 1px solid #767676;
   border-radius: 3px;
 }
@@ -485,7 +489,7 @@ h2 {
 }
 .shipment-card-tracking {
   font-weight: 600;
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   font-family: var(--heading-font);
   letter-spacing: -0.01em;
 }
@@ -495,21 +499,24 @@ h2 {
 }
 .shipment-card-meta {
   margin-top: 0.2rem;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: #666;
 }
 
 .status-pill {
   padding: 0.2rem 0.6rem;
   border-radius: 3px;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   font-weight: 700;
   white-space: nowrap;
 }
-.status-pill.status-created,
-.status-pill.status-collected {
+.status-pill.status-created {
   background: #eef1f7;
   color: #2b3b58;
+}
+.status-pill.status-collected {
+  background: #e6f6ec;
+  color: #1e6b3c;
 }
 .status-pill.status-in_transit,
 .status-pill.status-out_for_delivery {
@@ -592,7 +599,7 @@ h2 {
 }
 .field-error {
   margin: 0.25rem 0 0;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: #b3261e;
 }
 
@@ -860,7 +867,7 @@ textarea:focus-visible {
 
 .stage-label {
   margin-top: 0.5rem;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: #666;
 }
@@ -908,20 +915,15 @@ textarea:focus-visible {
     top: 11px;
   }
   .stage-label {
-    font-size: 0.62rem;
+    font-size: 0.65rem;
     margin-top: 0.35rem;
   }
   .stage-sublabel {
-    font-size: 0.6rem;
+    font-size: 0.65rem;
   }
 }
 
 html, body {
-  overflow-x: hidden;
-}
-
-.tracking-page,
-.staff-content {
   overflow-x: hidden;
 }
 
@@ -963,7 +965,7 @@ html, body {
 }
 .timeline-audit {
   margin-top: 0.2rem;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   color: #666;
   font-style: italic;
 }
@@ -971,7 +973,25 @@ html, body {
   height: 280px;
   border-radius: 8px;
   border: 1px solid #e2e5eb;
+}
+.shipment-map-frame {
+  position: relative;
   margin: 1.5rem 0;
+}
+.map-unavailable {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 1px solid #e2e5eb;
+  border-radius: 8px;
+  background: #f5f6f8;
+  color: #333;
+  text-align: center;
 }
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
