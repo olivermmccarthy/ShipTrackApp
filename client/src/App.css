@@ -967,3 +967,9 @@ html, body {
   color: #666;
   font-style: italic;
 }
+.shipment-map {
+  height: 280px;
+  border-radius: 8px;
+  border: 1px solid #e2e5eb;
+  margin: 1.5rem 0;
+}

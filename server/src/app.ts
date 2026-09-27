@@ -244,7 +244,7 @@ const createShipmentSchema = z.object({
   trackingNumber: z.string().trim().min(1).optional(),
   origin: z.string().trim().min(1),
   destination: z.string().trim().min(1),
-  estimatedDelivery: z.string().datetime().or(z.string().min(1)),
+  estimatedDelivery: z.string().datetime(),
   currentLocation: z.string().trim().min(1),
   details: z.record(z.union([z.string(), z.number()])).optional(),
 });
