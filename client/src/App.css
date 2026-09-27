@@ -973,3 +973,35 @@ html, body {
   border: 1px solid #e2e5eb;
   margin: 1.5rem 0;
 }
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px #fff inset;
+  -webkit-text-fill-color: #1a1a1a;
+  transition: background-color 5000s ease-in-out 0s;
+}
+.stage-map-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  align-items: stretch;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 900px) {
+  .stage-map-grid {
+    grid-template-columns: minmax(240px, 1fr) minmax(320px, 1.3fr);
+  }
+}
+
+.stage-column {
+  display: flex;
+}
+
+.stage-column .stage-tracker {
+  margin-bottom: 0;
+  height: 100%;
+}

@@ -175,34 +175,38 @@ function ShipmentResult({ shipment }: { shipment: Shipment }) {
 
       <StageTracker status={shipment.status} events={shipment.events} />
 
-      <div aria-hidden="true">
-        <h2>Route</h2>
-        <ShipmentMap
-          origin={shipment.origin}
-          destination={shipment.destination}
-          currentLocation={shipment.currentLocation}
-        />
-      </div>
+      <div className="route-timeline-grid">
+        <div className="map-column" aria-hidden="true">
+          <h2>Route</h2>
+          <ShipmentMap
+            origin={shipment.origin}
+            destination={shipment.destination}
+            currentLocation={shipment.currentLocation}
+          />
+        </div>
 
-      <h2>Tracking history</h2>
-      {shipment.events.length === 0 ? (
-        <p className="hint">No tracking events yet.</p>
-      ) : (
-        <ol className="timeline">
-          {[...shipment.events].reverse().map((event, i) => (
-            <li key={i} className={i === 0 ? 'timeline-latest' : ''}>
-              <div className="timeline-date">
-                {formatDateTime(event.occurredAt)}
-              </div>
-              <div className="timeline-status">
-                {STATUS_LABELS[event.status] ?? event.status}
-              </div>
-              <div className="timeline-location">{event.location}</div>
-              <div className="timeline-message">{event.message}</div>
-            </li>
-          ))}
-        </ol>
-      )}
+        <div className="timeline-column">
+          <h2>Tracking history</h2>
+          {shipment.events.length === 0 ? (
+            <p className="hint">No tracking events yet.</p>
+          ) : (
+            <ol className="timeline">
+              {[...shipment.events].reverse().map((event, i) => (
+                <li key={i} className={i === 0 ? 'timeline-latest' : ''}>
+                  <div className="timeline-date">
+                    {formatDateTime(event.occurredAt)}
+                  </div>
+                  <div className="timeline-status">
+                    {STATUS_LABELS[event.status] ?? event.status}
+                  </div>
+                  <div className="timeline-location">{event.location}</div>
+                  <div className="timeline-message">{event.message}</div>
+                </li>
+              ))}
+            </ol>
+          )}
+        </div>
+      </div>
 
       <dl className="shipment-summary">
         <div>
