@@ -14,6 +14,7 @@ export default function EnquiriesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [filter, setFilter] = useState<'ALL' | 'OPEN' | 'RESOLVED'>('ALL');
+   const [toggleError, setToggleError] = useState<string | null>(null);
 
   async function load() {
     setLoading(true);
@@ -36,12 +37,21 @@ export default function EnquiriesPage() {
 
   async function toggleState(enquiry: Enquiry) {
     const newState = enquiry.state === 'OPEN' ? 'RESOLVED' : 'OPEN';
-    await fetch(`/api/staff/enquiries/${enquiry.id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ state: newState }),
-    });
-    load();
+    setToggleError(null);
+    try {
+      const res = await fetch(`/api/staff/enquiries/${enquiry.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ state: newState }),
+      });
+      if (!res.ok) {
+        setToggleError("Couldn't update that enquiry. Please try again.");
+        return;
+      }
+      load();
+    } catch {
+      setToggleError("Couldn't update that enquiry. Please try again.");
+    }
   }
 
   if (loading) return <p className="hint">Loading enquiries…</p>;
@@ -60,6 +70,13 @@ export default function EnquiriesPage() {
   return (
     <div>
       <h1>Enquiries</h1>
+
+      <h1>Enquiries</h1>
+      {toggleError && (
+        <p className="error-message" role="alert">
+          {toggleError}
+        </p>
+      )}
 
       <div className="filter-bar">
         <select

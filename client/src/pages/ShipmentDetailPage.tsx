@@ -7,8 +7,14 @@ type Event = {
   location: string;
   message: string;
   occurredAt: string;
+  createdBy?: string | null;
 };
-type Note = { id: string; body: string; createdAt: string };
+type Note = {
+  id: string;
+  body: string;
+  createdAt: string;
+  createdBy?: string | null;
+};
 type ShipmentDetail = {
   id: string;
   trackingNumber: string;
@@ -99,6 +105,9 @@ export default function ShipmentDetailPage() {
             </div>
             <div className="timeline-location">{e.location}</div>
             <div className="timeline-message">{e.message}</div>
+            {e.createdBy && (
+              <div className="timeline-audit">Updated by {e.createdBy}</div>
+            )}
           </li>
         ))}
       </ol>
@@ -130,12 +139,14 @@ function EditDetailsForm({
   const [submitting, setSubmitting] = useState(false);
   const [saved, setSaved] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitting(true);
     setSaved(false);
     setFieldErrors({});
+    setError(null);
     try {
       const res = await fetch(`/api/staff/shipments/${shipment.id}`, {
         method: 'PATCH',
@@ -152,7 +163,13 @@ function EditDetailsForm({
         onSaved();
       } else {
         const data = await res.json().catch(() => null);
-        setFieldErrors(data?.error?.fields ?? {});
+        if (data?.error?.fields) {
+          setFieldErrors(data.error.fields);
+        } else {
+          setError(
+            data?.error?.message ?? "Couldn't save changes. Please try again.",
+          );
+        }
       }
     } finally {
       setSubmitting(false);
@@ -181,7 +198,9 @@ function EditDetailsForm({
       <input
         id="destination"
         aria-invalid={Boolean(fieldErrors.destination)}
-        aria-describedby={fieldErrors.destination ? 'edit-destination-error' : undefined}
+        aria-describedby={
+          fieldErrors.destination ? 'edit-destination-error' : undefined
+        }
         value={destination}
         onChange={(e) => setDestination(e.target.value)}
         required
@@ -196,7 +215,9 @@ function EditDetailsForm({
       <input
         id="currentLocation"
         aria-invalid={Boolean(fieldErrors.currentLocation)}
-        aria-describedby={fieldErrors.currentLocation ? 'edit-location-error' : undefined}
+        aria-describedby={
+          fieldErrors.currentLocation ? 'edit-location-error' : undefined
+        }
         value={currentLocation}
         onChange={(e) => setCurrentLocation(e.target.value)}
         required
@@ -212,7 +233,9 @@ function EditDetailsForm({
         id="estimatedDelivery"
         type="date"
         aria-invalid={Boolean(fieldErrors.estimatedDelivery)}
-        aria-describedby={fieldErrors.estimatedDelivery ? 'edit-delivery-error' : undefined}
+        aria-describedby={
+          fieldErrors.estimatedDelivery ? 'edit-delivery-error' : undefined
+        }
         value={estimatedDelivery}
         onChange={(e) => setEstimatedDelivery(e.target.value)}
         required
@@ -223,6 +246,11 @@ function EditDetailsForm({
         </p>
       )}
 
+      {error && (
+        <p className="error-message" role="alert">
+          {error}
+        </p>
+      )}
       <button type="submit" disabled={submitting}>
         {submitting ? 'Saving…' : 'Save details'}
       </button>
@@ -359,17 +387,26 @@ function NotesSection({
 }) {
   const [body, setBody] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!body.trim()) return;
     setSubmitting(true);
+    setError(null);
     try {
-      await fetch(`/api/staff/shipments/${shipmentId}/notes`, {
+      const res = await fetch(`/api/staff/shipments/${shipmentId}/notes`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ body }),
       });
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        setError(
+          data?.error?.message ?? "Couldn't add note. Please try again.",
+        );
+        return;
+      }
       setBody('');
       onAdded();
     } finally {
@@ -387,6 +424,12 @@ function NotesSection({
           <li key={n.id}>
             <div className="timeline-date">
               {new Date(n.createdAt).toLocaleString('en-GB')}
+              {n.createdBy && (
+                <span className="timeline-audit">
+                  {' '}
+                  · Added by {n.createdBy}
+                </span>
+              )}
             </div>
             <div>{n.body}</div>
           </li>
@@ -401,6 +444,11 @@ function NotesSection({
           rows={2}
           placeholder="Add an internal note…"
         />
+        {error && (
+          <p className="error-message" role="alert">
+            {error}
+          </p>
+        )}
         <button type="submit" disabled={submitting}>
           {submitting ? 'Adding…' : 'Add note'}
         </button>

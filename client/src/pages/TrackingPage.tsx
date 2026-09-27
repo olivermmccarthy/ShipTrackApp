@@ -174,6 +174,26 @@ function ShipmentResult({ shipment }: { shipment: Shipment }) {
 
       <StageTracker status={shipment.status} events={shipment.events} />
 
+      <h2>Tracking history</h2>
+      {shipment.events.length === 0 ? (
+        <p className="hint">No tracking events yet.</p>
+      ) : (
+        <ol className="timeline">
+          {[...shipment.events].reverse().map((event, i) => (
+            <li key={i} className={i === 0 ? 'timeline-latest' : ''}>
+              <div className="timeline-date">
+                {formatDateTime(event.occurredAt)}
+              </div>
+              <div className="timeline-status">
+                {STATUS_LABELS[event.status] ?? event.status}
+              </div>
+              <div className="timeline-location">{event.location}</div>
+              <div className="timeline-message">{event.message}</div>
+            </li>
+          ))}
+        </ol>
+      )}
+
       <dl className="shipment-summary">
         <div>
           <dt>Tracking number</dt>
@@ -210,26 +230,6 @@ function ShipmentResult({ shipment }: { shipment: Shipment }) {
           </div>
         ))}
       </dl>
-
-      <h2>Tracking history</h2>
-      {shipment.events.length === 0 ? (
-        <p className="hint">No tracking events yet.</p>
-      ) : (
-        <ol className="timeline">
-          {[...shipment.events].reverse().map((event, i) => (
-            <li key={i} className={i === 0 ? 'timeline-latest' : ''}>
-              <div className="timeline-date">
-                {formatDateTime(event.occurredAt)}
-              </div>
-              <div className="timeline-status">
-                {STATUS_LABELS[event.status] ?? event.status}
-              </div>
-              <div className="timeline-location">{event.location}</div>
-              <div className="timeline-message">{event.message}</div>
-            </li>
-          ))}
-        </ol>
-      )}
       <EnquiryForm trackingNumber={shipment.trackingNumber} />
     </div>
   );
@@ -260,9 +260,7 @@ function formatKey(key: string) {
 function EnquiryForm({ trackingNumber }: { trackingNumber: string }) {
   const [category, setCategory] = useState('General Question');
   const [message, setMessage] = useState('');
-  const [status, setStatus] = useState<
-    'idle' | 'submitting' | 'success' | 'error'
-  >('idle');
+  const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
