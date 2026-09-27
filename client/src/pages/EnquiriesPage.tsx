@@ -70,8 +70,6 @@ export default function EnquiriesPage() {
   return (
     <div>
       <h1>Enquiries</h1>
-
-      <h1>Enquiries</h1>
       {toggleError && (
         <p className="error-message" role="alert">
           {toggleError}
