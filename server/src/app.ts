@@ -14,6 +14,7 @@ import { requireAuth, type AuthedRequest } from './middleware/requireAuth.js';
 const app = express();
 app.use(
   helmet({
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
     contentSecurityPolicy: {
       directives: {
         ...helmet.contentSecurityPolicy.getDefaultDirectives(),
