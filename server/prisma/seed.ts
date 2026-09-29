@@ -431,7 +431,6 @@ const enquiries = [
 ];
 
 async function main() {
-
   const staffEmail = process.env.SEED_STAFF_EMAIL!;
   const staffPassword = process.env.SEED_STAFF_PASSWORD!;
   const passwordHash = await bcrypt.hash(staffPassword, 10);
@@ -442,7 +441,7 @@ async function main() {
     create: { email: staffEmail.toLowerCase(), passwordHash },
   });
   console.log('Seeded staff user:', staffEmail);
-  
+
   const shipmentIds: Record<string, string> = {};
 
   for (const s of shipments) {
@@ -496,3 +495,12 @@ async function main() {
   });
   console.log('Seeded internal notes');
 }
+
+main()
+  .catch((err) => {
+    console.error(err);
+    process.exit(1);
+  })
+  .finally(() => {
+    prisma.$disconnect();
+  });

@@ -9,7 +9,7 @@ The free Render tier spins down after 15 minutes with no traffic, so the first l
 
 ## What it does
 
-On the customer side, you enter a tracking number and get the current status, origin and destination, ETA (with the original ETA shown too if it's changed), current location, a progress tracker, a route map, and the full event history. Empty input, an unknown tracking number, and loading are all handled as their own states rather than one generic error. There's also a form to submit an enquiry against a shipment, category plus message, no account required.
+On the customer side, you enter a tracking number and get the current status, origin and destination, ETA (with the original ETA shown too if it's changed), current location, a progress tracker, a route map, and the full event history. If the box's empty, the number doesn't exist, or it's still loading, each gets its own message instead of one generic error. There's also a form to submit an enquiry against a shipment, category plus message, no account required.
 
 On the staff side: log in, search and filter shipments, open one up to edit its details, add tracking events, and leave internal notes that never show up on the public page. There's also an enquiries screen to see what customers have asked and mark things resolved.
 
@@ -39,9 +39,32 @@ cd server && npm install && cd ..
 
 **2. Environment variables**
 
-Copy `server/.env.example` to `server/.env` and fill it in.
+Copy `server/.env.example` to `server/.env` and fill it in:
 
-**3. Run it**
+```
+DATABASE_URL=
+
+# Any long random string
+JWT_SECRET=
+
+# Demo staff login, created by the seed script
+SEED_STAFF_EMAIL=
+SEED_STAFF_PASSWORD=
+
+NODE_ENV=development
+```
+
+**3. Set up the database**
+
+```bash
+cd server
+npx prisma migrate deploy
+npx prisma generate
+npx tsx prisma/seed.ts
+cd ..
+```
+
+**4. Run it**
 
 Two terminals, both from the repo root:
 
@@ -73,7 +96,7 @@ There are also several `TRK-EXTRA-...` shipments seeded in, covering the same st
 
 ## Tests
 
-The backend tests hit the real database, so `.env` needs to be filled in and the database seeded first.
+The backend tests use the real database, so `.env` needs to be filled in and the database seeded first.
 
 ```bash
 cd server && npm test && cd ..
@@ -82,7 +105,7 @@ cd client && npm test
 
 On the backend: the public tracking lookup, a 404 for an unknown tracking number, a rejected request with no session, a rejected login with the wrong password, a rejected enquiry missing a field, and one that specifically proves internal notes never show up on the public endpoint (it adds a note, checks it's not there, then deletes it again). On the frontend: the tracking form rejects an empty submission. It's not exhaustive coverage, but should cover the main points.
 
-CI runs both suites on every push against the same Supabase database I develop against, not a separate test database. That's a shortcut given the time I had. It works because the seed script is safe to run more than once and the tests tidy up after themselves.
+CI runs both suites on every push against the same Supabase database I develop against, not a separate test database. Not best practice but for this it was fine.
 
 ## API
 
@@ -109,9 +132,7 @@ REST, JSON. Errors always come back as `{ "error": { "code": "...", "message": "
 
 ## Decisions worth explaining
 
-Status only changes through tracking events. Adding an event updates the shipment's status, location, and optionally its ETA, all in one transaction. That means the status shown can never contradict its own history, and a Delivered shipment always has an actual Delivered event behind it. `PATCH /shipments/:id` deliberately can't touch status for this reason.
-
-I left status transitions unrestricted, so technically you could move a Delivered shipment back to In Transit. The brief says "allow movement between supported statuses," and I read that as intentionally not wanting a strict state machine, so I didn't build one.
+Status only changes through tracking events. Adding an event updates the shipment's status, location, and optionally its ETA, all in one transaction. So the status can't disagree with its own history, and a Delivered shipment always has a real Delivered event behind it. `PATCH /shipments/:id` deliberately can't touch status for this reason.
 
 Events dated in the future are rejected with a 400 rather than allowed through.
 
@@ -121,4 +142,18 @@ Tracking numbers are `TRK-` plus six random characters when auto-generated. Dupl
 
 Enquiries link to a shipment by tracking number, not by its internal ID, since that's the only thing a customer actually has.
 
-Shipment `details` is a loose JSON field (service, package count,
+Shipment `details` is a loose JSON field (service, package count, weight, whatever) rather than fixed columns, matching the brief's "small set of fictional shipment details."
+
+Internal notes live on their own table and never come back from the public endpoint. There's a test for this specifically, not just a visual check.
+
+The route map uses a hardcoded lookup from known city names to coordinates, not real geocoding, in line with the brief's own suggestion to use mock coordinates. If a shipment's locations aren't in the lookup, the map just shows a "not available" message instead of breaking.
+
+The audit trail stores the staff member's email as a plain string on events and notes, not a proper foreign key. A real multi-staff system would want that as a relation. Also worth noting: general edits to a shipment's details don't record who made them, only events and notes do.
+
+## What I'd do with more time
+
+- Implement rate limiting on login and the enquiry form.
+- Add deletion.
+- If a staff session expires mid-use, the UI shows a generic error instead of bouncing back to login cleanly.
+- CI shares the dev database instead of a separate test one, a proper isolated test database would be the better long-term setup.
+- Accessibility and colour contrast were checked by hand as I went, not run through a full automated audit tool.
